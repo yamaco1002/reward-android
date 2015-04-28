@@ -1,0 +1,42 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "jp.kyuuki.reward.android"
+        minSdkVersion 9
+        targetSdkVersion 21
+        versionCode 1
+        versionName "0.0.2"
+        manifestPlaceholders = [activityLabel: "defaultName"]
+    }
+    productFlavors {
+        development {
+            applicationId "jp.kyuuki.reward.android.development"
+            manifestPlaceholders = [activityLabel: "defaultName"]
+            buildConfigField "String", "BASE_URL", "\"http://kyuuki.jp:3000/api/v1\""
+        }
+        production {
+            buildConfigField "String", "BASE_URL", "\"http://admin.dolly-reward.com/api/v1\""
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            lintOptions {
+                ignore 'MissingTranslation'
+            }
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.google.android.gms:play-services:6.5.87'
+    compile 'com.mcxiaoke.volley:library:1.0.+'
+    compile 'com.android.support:support-v4:21.0.3'
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">リワードアプリ（仮）</string>
+    <string name="app_name_drawer">リワード（仮）</string>
+
+
+    <string name="title_section1">案件リスト</string>
+    <string name="title_section2">ヘルプ</string>
+    <string name="title_section3">このアプリについて</string>
+
+    <string name="menu_offer_list">お仕事一覧</string>
+    <string name="menu_point_exchange">ポイント交換</string>
+    <string name="menu_point_history">ポイント履歴</string>
+    <string name="menu_help">ヘルプ</string>
+    <string name="menu_about">アプリ情報</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">交換</string>
+
+    <string name="action_settings">設定</string>
+    <string name="point_unit">ポイント</string>
+    <string name="query">お問い合わせ</string>
+
+    <string name="error_communication">通信エラー</string>
+
+    <string name="query_mail_subject">お問い合わせ</string>
+    <string name="query_mail_text"></string>
+</resources>
