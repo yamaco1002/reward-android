@@ -3,6 +3,8 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content" >
 
+
+
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
@@ -39,9 +41,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:gravity="center|bottom"
                 android:textColor="#ff0000"
-                android:textSize="30sp" />
+                android:textSize="24sp" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -57,8 +59,8 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1px"
+        android:layout_height="1dp"
         android:layout_alignParentBottom="true"
-        android:background="#000000" />
+        android:background="#666666" />
 
 </RelativeLayout>

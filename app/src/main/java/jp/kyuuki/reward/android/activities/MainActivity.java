@@ -1,6 +1,7 @@
 package jp.kyuuki.reward.android.activities;
 
 import android.app.Activity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -31,11 +32,14 @@ import jp.kyuuki.reward.android.fragment.HelpFragment;
 import jp.kyuuki.reward.android.fragment.NavigationDrawerFragment;
 import jp.kyuuki.reward.android.R;
 import jp.kyuuki.reward.android.fragment.OfferListFragment;
+import jp.kyuuki.reward.android.fragment.ProgressDialogFragment;
 import jp.kyuuki.reward.android.models.MediaUser;
 import jp.kyuuki.reward.android.models.NavigationMenu;
 
 public class MainActivity extends BaseActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, GcmManager.GcmManagerCallbacks {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
+                   GcmManager.GcmManagerCallbacks,
+                   OfferListFragment.OnFragmentInteractionListener {
 
     {
         TAG = MainActivity.class.getName();
@@ -96,7 +100,7 @@ public class MainActivity extends BaseActivity
         NavigationMenu navigationMenu = values[position];
         switch (navigationMenu) {
             case OFFER_LIST:
-                fragment = OfferListFragment.newInstance("1", "2");
+                fragment = OfferListFragment.newInstance();
                 break;
             case POINT_EXCHANGE:
                 fragment = PlaceholderFragment.newInstance(0);
@@ -200,6 +204,34 @@ public class MainActivity extends BaseActivity
             });
 
         requestQueue.add(request);
+    }
+
+    // OfferListFragment.OnFragmentInteractionListener
+    @Override
+    public void onFragmentInteraction(String id) {
+        Fragment fragment = PlaceholderFragment.newInstance(0);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    ProgressDialogFragment progressDialog;
+
+    // 通信中ダイアログ
+    public void showProgressDialog(String title, String message) {
+        Logger.v(TAG, "showProgressDialog()");
+        progressDialog = ProgressDialogFragment.newInstance(title, message);
+        progressDialog.show(getSupportFragmentManager(), "progress");
+    }
+
+    public void dismissProgressDialog() {
+        Logger.v(TAG, "dismissProgressDialog()");
+        progressDialog.getDialog().dismiss();
+        // http://furudate.hatenablog.com/entry/2014/01/09/162421
+        // progressDialog.dismiss() がなぜダメか、仕組みがよくわかっていない。
     }
 
     /**

@@ -21,6 +21,8 @@
     <string name="point_unit">point</string>
     <string name="query">Query</string>
 
+    <string name="dialog_message_communicating">Communicating...</string>
+
     <string name="error_communication">Communication error</string>
 
     <string name="query_mail_subject">Inquiry</string>

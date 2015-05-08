@@ -4,40 +4,24 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
-
 import jp.kyuuki.reward.android.models.MediaUser;
-import jp.kyuuki.reward.android.models.Offer;
 
 /**
- * ユーザー登録 API
+ * ユーザー取得 API
  */
-public class PostMediaUsers extends RewardApi<MediaUser> {
+public class GetMediaUsers extends RewardApi<MediaUser> {
 
     /*
      * HTTP リクエスト仕様
      */
-    public static PostMediaUsers create(String terminalId, JSONObject terminalInfo, String androidRegistrationId) {
-        PostMediaUsers api = new PostMediaUsers();
+    public static GetMediaUsers create(long uid) {
+        GetMediaUsers api = new GetMediaUsers();
 
         // URL
-        api.url = BASE_URL + "/media_users.json";
+        api.url = BASE_URL + "/media_users/" + uid + ".json";
 
         // Body
-        JSONObject jsonRequest = new JSONObject();
-
-        try {
-            jsonRequest.put("terminal_id", terminalId);
-            jsonRequest.put("terminal_info", terminalInfo);
-            jsonRequest.put("android_registration_id", androidRegistrationId);
-        } catch (JSONException e) {
-            // 値が数値の時にしか発生しない、致命的なエラーなので、落としてしまってよい。
-            // TODO: 致命的なバグに気付くしくみ、共通ライブラリ化
-            e.printStackTrace();
-            throw new IllegalStateException();
-        }
-
-        api.jsonRequest = jsonRequest;
+        api.jsonRequest = null;
 
         return api;
     }

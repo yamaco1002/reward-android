@@ -18,11 +18,13 @@ public class MediaUser {
 
     public long mediaUserId;
     public String terminalId;
+    public long point;
 
     // データモデルとしてのメディアユーザー
-    public MediaUser(long mediaUserId, String terminalId) {
+    public MediaUser(long mediaUserId, String terminalId, long point) {
         this.mediaUserId = mediaUserId;
-        this.terminalId = terminalId;
+        this.terminalId  = terminalId;
+        this.point       = point;
     }
 
     // 自分用
@@ -36,6 +38,7 @@ public class MediaUser {
             return mediaUser;
         }
 
+        // TODO: 保持するデータはどこかで一元管理しておきたい。
         final SharedPreferences prefs = getMediaUserPreferences(context);
         long mediaUserId = prefs.getLong(PROPERTY_MEDIA_USER_ID, -1);
         String terminalId = prefs.getString(PROPERTY_TERMINAL_ID, null);
@@ -44,7 +47,7 @@ public class MediaUser {
             return null;
         }
 
-        mediaUser = new MediaUser(mediaUserId, terminalId);
+        mediaUser = new MediaUser(mediaUserId, terminalId, 0);  // TODO: ポイントも保持
 
         return mediaUser;
     }

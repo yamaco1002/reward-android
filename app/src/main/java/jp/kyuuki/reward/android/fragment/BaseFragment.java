@@ -18,6 +18,9 @@ import jp.kyuuki.reward.android.commons.Logger;
 public abstract class BaseFragment extends Fragment {
 
     protected String TAG = BaseFragment.class.getName();
+    protected String getLogTag() {
+        return TAG;
+    }
 
     public BaseFragment() {
         // Required empty public constructor
@@ -26,25 +29,26 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Logger.v(TAG, "onCreate()");
+        Logger.v(getLogTag(), "[" + this.hashCode() +"] onCreate()");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // super は呼ばない。
-        Logger.v(TAG, "onCreateView()");
+        Logger.v(getLogTag(), "[" +  this.hashCode() +"] onCreateView()");
+        Logger.v(getLogTag(), "[" +  this.hashCode() +"]   savedInstanceState = " + savedInstanceState);
         return null;
     }
 
     @Override
     public void onAttach(Activity activity) {
-        Logger.v(TAG, "onAttach()");
+        Logger.v(getLogTag(),  "[" +  this.hashCode() +"] onAttach()");
         super.onAttach(activity);
     }
 
     @Override
     public void onDetach() {
-        Logger.v(TAG, "onDetach()");
+        Logger.v(getLogTag(),  "[" +  this.hashCode() +"] onDetach()");
         super.onDetach();
     }
 

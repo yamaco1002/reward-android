@@ -21,7 +21,7 @@ public final class VolleyUtils {
 
     public static RequestQueue getRequestQueue(Context context) {
         if (mRequestQueue == null) {
-            Logger.d(TAG, "newRequestQueue");
+            Logger.d(TAG, "newRequestQueue()");
             mRequestQueue = Volley.newRequestQueue(context);
         }
 
@@ -30,7 +30,7 @@ public final class VolleyUtils {
 
     public static ImageLoader getImageLoader(Context context) {
         if (mImageLoader == null) {
-            Logger.d(TAG, "newImageLoader");
+            Logger.d(TAG, "newImageLoader()");
             mImageLoader = new ImageLoader(getRequestQueue(context), new BitmapCache());
         }
 

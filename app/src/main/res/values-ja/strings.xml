@@ -23,6 +23,8 @@
     <string name="point_unit">ポイント</string>
     <string name="query">お問い合わせ</string>
 
+    <string name="dialog_message_communicating">通信中...</string>
+
     <string name="error_communication">通信エラー</string>
 
     <string name="query_mail_subject">お問い合わせ</string>
