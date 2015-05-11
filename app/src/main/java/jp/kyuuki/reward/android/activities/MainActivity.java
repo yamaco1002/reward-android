@@ -29,11 +29,13 @@ import jp.kyuuki.reward.android.fragment.AboutFragment;
 import jp.kyuuki.reward.android.fragment.HelpFragment;
 import jp.kyuuki.reward.android.fragment.NavigationDrawerFragment;
 import jp.kyuuki.reward.android.R;
+import jp.kyuuki.reward.android.fragment.OfferDetailFragment;
 import jp.kyuuki.reward.android.fragment.OfferListFragment;
 import jp.kyuuki.reward.android.fragment.PointHistoryListFragment;
 import jp.kyuuki.reward.android.fragment.ProgressDialogFragment;
 import jp.kyuuki.reward.android.models.MediaUser;
 import jp.kyuuki.reward.android.models.NavigationMenu;
+import jp.kyuuki.reward.android.models.Offer;
 
 public class MainActivity extends BaseActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
@@ -223,10 +225,12 @@ public class MainActivity extends BaseActivity
         requestQueue.add(request);
     }
 
-    // OfferListFragment.OnFragmentInteractionListener
+    /*
+     * OfferListFragment.OnFragmentInteractionListener
+     */
     @Override
-    public void onFragmentInteraction(String id) {
-        Fragment fragment = PlaceholderFragment.newInstance(0);
+    public void onFragmentInteraction(Offer offer) {
+        Fragment fragment = OfferDetailFragment.newInstance(offer);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .replace(R.id.container, fragment)

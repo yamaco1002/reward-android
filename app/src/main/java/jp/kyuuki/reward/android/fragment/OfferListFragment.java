@@ -169,17 +169,17 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Offer offer = (Offer) parent.getItemAtPosition(position);
 
-        if (null != mListener) {
+        if (mListener != null) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
             //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-            //mListener.onFragmentInteraction(offer.getName());
+            mListener.onFragmentInteraction(offer);
         }
 
         // TODO: オファー詳細表示
 
-        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(offer.getExecuteUrl()));
-        startActivity(i);
+        //Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(offer.getExecuteUrl()));
+        //startActivity(i);
     }
 
     /**
@@ -206,8 +206,7 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String id);
+        void onFragmentInteraction(Offer offer);
     }
 
 

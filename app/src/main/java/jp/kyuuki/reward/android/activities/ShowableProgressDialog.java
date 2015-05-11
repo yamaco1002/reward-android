@@ -1,7 +1,7 @@
 package jp.kyuuki.reward.android.activities;
 
 /**
- * i’»ƒ_ƒCƒAƒƒO‚ª•\¦‰Â”\‚È ActivityB
+ * é€²æ—ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãŒè¡¨ç¤ºå¯èƒ½ãª Activityã€‚
  */
 public interface ShowableProgressDialog {
     void showProgressDialog(String title, String message);

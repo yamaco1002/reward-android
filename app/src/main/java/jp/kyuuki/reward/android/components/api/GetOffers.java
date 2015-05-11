@@ -73,7 +73,11 @@ public class GetOffers extends RewardApi<List<Offer>> {
         String detail = "";
         String iconUrl = "";
         String executeUrl = "";
+        String requirement = "";
+        String requirementDetail = "";
+        String period = "";
         int point = 0;
+        int price = 0;
         try {
             name = o.getString("name");
             detail = o.getString("detail");
@@ -87,12 +91,16 @@ public class GetOffers extends RewardApi<List<Offer>> {
 //                }
 //            }
             point = o.getInt("point");
+            price = o.getInt("price");
+            requirement = o.getString("requirement");
+            requirementDetail = o.getString("requirement_detail");
+            period = o.getString("period");
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        Offer offer = new Offer(name, detail, point, iconUrl, executeUrl);
+        Offer offer = new Offer(name, detail, price, point, iconUrl, executeUrl, requirement, requirementDetail, period);
 
         return offer;
     }
