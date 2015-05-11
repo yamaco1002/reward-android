@@ -31,9 +31,9 @@ import jp.kyuuki.reward.android.commons.Utils;
  */
 public class AboutFragment extends BaseFragment {
 
-    {
-        TAG = AboutFragment.class.getName();
-    }
+    private static final String TAG = AboutFragment.class.getName();
+    @Override
+    protected String getLogTag() { return TAG; }
 
     private OnFragmentInteractionListener mListener;
 

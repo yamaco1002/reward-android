@@ -1,8 +1,6 @@
 package jp.kyuuki.reward.android.fragment;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,51 +23,35 @@ import org.json.JSONObject;
 import java.util.List;
 
 import jp.kyuuki.reward.android.R;
-
-import jp.kyuuki.reward.android.activities.MainActivity;
+import jp.kyuuki.reward.android.activities.ShowableProgressDialog;
 import jp.kyuuki.reward.android.commons.Logger;
 import jp.kyuuki.reward.android.commons.VolleyUtils;
 import jp.kyuuki.reward.android.components.api.GetMediaUsers;
-import jp.kyuuki.reward.android.components.api.GetOffers;
+import jp.kyuuki.reward.android.components.api.GetPointHistories;
 import jp.kyuuki.reward.android.models.MediaUser;
-import jp.kyuuki.reward.android.models.Offer;
+import jp.kyuuki.reward.android.models.PointHistory;
 
 /**
- * オファー一覧フラグメント。
- *
- * A fragment representing a list of Items.
- * <p/>
- * Large screen devices (such as tablets) are supported by replacing the ListView
- * with a GridView.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
- * interface.
+ * ポイント履歴一覧フラグメント。
  */
-public class OfferListFragment extends BaseFragment implements AbsListView.OnItemClickListener {
+public class PointHistoryListFragment extends BaseFragment {
 
-    private static final String TAG = OfferListFragment.class.getName();
+    private static final String TAG = PointHistoryListFragment.class.getName();
     @Override
     protected String getLogTag() { return TAG; }
 
-    private OnFragmentInteractionListener mListener;
-
     // Model
     long mPoint;
-    List<Offer> offers;
+    List<PointHistory> mPointHistories;
 
     // View
     private TextView mCurrentPointText;
-
-    /**
-     * The fragment's ListView/GridView.
-     */
     private AbsListView mListView;
 
-    /**
-     * The Adapter which will be used to populate the ListView/GridView with
-     * Views.
-     */
     private ListAdapter mAdapter;
+
+    // 進捗ダイアログを表示してくれる人
+    private ShowableProgressDialog mShowableProgressDialog;
 
     // 通信
     public RequestQueue mRequestQueue;
@@ -77,23 +59,14 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
     /*
      * 初期処理
      */
-    private static final String ARG_CREATE_TIME = "create_time";
-
-    public static OfferListFragment newInstance() {
-        OfferListFragment fragment = new OfferListFragment();
-        Bundle args = new Bundle();
-        args.putLong(ARG_CREATE_TIME, System.currentTimeMillis());
-        fragment.setArguments(args);
+    public static PointHistoryListFragment newInstance() {
+        PointHistoryListFragment fragment = new PointHistoryListFragment();
         return fragment;
     }
 
     // 空のコンストラクタが必要。
     // http://y-anz-m.blogspot.jp/2012/04/androidfragment-setarguments.html
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public OfferListFragment() {
+    public PointHistoryListFragment() {
     }
 
 
@@ -105,38 +78,30 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
         super.onCreate(savedInstanceState);
 
         // このフラグメントは回転しても作り直さない。
-        // Activity で強制的に作り直しちゃっている場合があるので要注意！
         setRetainInstance(true);
 
-        if (getArguments() != null) {
-            Logger.e(TAG, "Create time  = " + getArguments().getLong(ARG_CREATE_TIME));
-            Logger.e(TAG, "Current time = " + System.currentTimeMillis());
-        }
-
+        mShowableProgressDialog = (ShowableProgressDialog) getActivity();
         mRequestQueue = VolleyUtils.getRequestQueue(getActivity());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // TODO: ログだけのために無理やり感が強い。もっときれいな方法ないか？
         super.onCreateView(inflater, container, savedInstanceState);
 
         // バックスタックから戻ったときに状態は遷移したままで onCreateView のみが呼ばれる。
+        // ポイント履歴画面から他の Activity 呼び出さないので、onCreateView のみ呼ばれるパターンが存在する？！
+        // とりあえず、オファー一覧フラグメント共通にしておく。
         if (state == State.INITIAL) {
             state.start(this);
         }
 
-        View view = inflater.inflate(R.layout.fragment_offerlist, container, false);
+        View view = inflater.inflate(R.layout.fragment_point_history_list_list, container, false);
 
         mCurrentPointText = (TextView) view.findViewById(R.id.current_point_text);
         mListView = (AbsListView) view.findViewById(android.R.id.list);
 
-        // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
-
         // View の再設定は毎回せなあかんものだろうか？
         if (state == State.READY) {
-            // View に ID 付けておけば復旧してくれるもの？
             mCurrentPointText.setText(String.valueOf(mPoint));
             ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
         }
@@ -147,41 +112,14 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
-
-    /*
-     * AbsListView.OnItemClickListener
-     */
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Offer offer = (Offer) parent.getItemAtPosition(position);
-
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-            //mListener.onFragmentInteraction(offer.getName());
-        }
-
-        // TODO: オファー詳細表示
-
-        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(offer.getExecuteUrl()));
-        startActivity(i);
-    }
-
+    // TODO: ポイント履歴が一件もないときの表示も考える (優先度低め)
     /**
      * The default content for this Fragment has a TextView that is shown when
      * the list is empty. If you would like to change the text, call this method
@@ -195,23 +133,7 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
         }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String id);
-    }
 
-
-    // このフラグメントにデータ取得の責任も持たせてしまう。
     /*
      * 状態管理
      *
@@ -219,13 +141,11 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
      */
     private State state = State.INITIAL;
 
-    // 全部のメソッドに状態管理対象のオブジェクトを引数と渡すのがキモいけど、State パターンも同じような感じかも。
-    // 状態をオブジェクトにしちゃうと重くなりそうだし、しかたがないかな。
     enum State {
         // 初期状態
         INITIAL {
             @Override
-            public void start(OfferListFragment fragment) {
+            public void start(PointHistoryListFragment fragment) {
                 fragment.getMediaUser();
 
                 fragment.transit(GETTING_USER);
@@ -235,55 +155,44 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
         // ユーザー情報取得中
         GETTING_USER {
             @Override
-            public void successGetMediaUser(OfferListFragment fragment, MediaUser mediaUser) {
+            public void successGetMediaUser(PointHistoryListFragment fragment, MediaUser mediaUser) {
                 // ポイント表示を更新
                 fragment.mPoint = mediaUser.point;
                 fragment.mCurrentPointText.setText(String.valueOf(fragment.mPoint));
-                fragment.getCampaignData();
+                fragment.getPointHistories();
 
-                fragment.transit(GETTING_OFFERS);
+                fragment.transit(GETTING_POINT_HISTORIES);
             }
 
             @Override
-            public void failureGetMediaUser(OfferListFragment fragment) {
+            public void failureGetMediaUser(PointHistoryListFragment fragment) {
                 // TODO: 端末の通信状態を確認
                 // TODO: サーバーの状態を確認
                 // TODO: エラーダイアログを表示
-                MainActivity activity = (MainActivity) fragment.getActivity();
-                if (activity != null) {
-                    activity.dismissProgressDialog();
-                    Toast.makeText(activity, activity.getString(R.string.error_communication), Toast.LENGTH_LONG).show();
-                }
+                fragment.mShowableProgressDialog.dismissProgressDialog();
+                Toast.makeText(fragment.getActivity(), fragment.getString(R.string.error_communication), Toast.LENGTH_LONG).show();
 
                 fragment.transit(ERROR);
             }
         },
 
-        // オファー情報取得中
-        GETTING_OFFERS {
+        // ポイント履歴取得中
+        GETTING_POINT_HISTORIES {
             @Override
-            public void successGetCampaginData(OfferListFragment fragment, List<Offer> offers) {
-                fragment.showCampaignData();
-
-                // TODO: MainActivity 依存を解消する。
-                MainActivity activity = (MainActivity) fragment.getActivity();
-                if (activity != null) {
-                    activity.dismissProgressDialog();
-                }
+            public void successGetPointHistories(PointHistoryListFragment fragment, List<PointHistory> pointHistories) {
+                fragment.showPointHistories();
+                fragment.mShowableProgressDialog.dismissProgressDialog();
 
                 fragment.transit(READY);
             }
 
             @Override
-            public void failureGetCampaginData(OfferListFragment fragment) {
+            public void failureGetPointHistories(PointHistoryListFragment fragment) {
                 // TODO: 端末の通信状態を確認
                 // TODO: サーバーの状態を確認
                 // TODO: エラーダイアログを表示
-                MainActivity activity = (MainActivity) fragment.getActivity();
-                if (activity != null) {
-                    activity.dismissProgressDialog();
-                    Toast.makeText(activity, activity.getString(R.string.error_communication), Toast.LENGTH_LONG).show();
-                }
+                fragment.mShowableProgressDialog.dismissProgressDialog();
+                Toast.makeText(fragment.getActivity(), fragment.getString(R.string.error_communication), Toast.LENGTH_LONG).show();
 
                 fragment.transit(ERROR);
             }
@@ -299,27 +208,27 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
          * イベント
          */
         // 初期処理開始
-        public void start(OfferListFragment fragment) {
+        public void start(PointHistoryListFragment fragment) {
             throw new IllegalStateException();
         }
 
         // ユーザー情報取得成功
-        public void successGetMediaUser(OfferListFragment fragment, MediaUser mediaUser) {
+        public void successGetMediaUser(PointHistoryListFragment fragment, MediaUser mediaUser) {
             throw new IllegalStateException();
         }
 
         // ユーザー情報取得失敗
-        public void failureGetMediaUser(OfferListFragment fragment) {
+        public void failureGetMediaUser(PointHistoryListFragment fragment) {
             throw new IllegalStateException();
         }
 
-        // キャンペーン情報取得成功
-        public void successGetCampaginData(OfferListFragment fragment, List<Offer> offers) {
+        // ポイント履歴取得成功
+        public void successGetPointHistories(PointHistoryListFragment fragment, List<PointHistory> pointHistories) {
             throw new IllegalStateException();
         }
 
-        // キャンペーン情報取得失敗
-        public void failureGetCampaginData(OfferListFragment fragment) {
+        // ポイント履歴取得失敗
+        public void failureGetPointHistories(PointHistoryListFragment fragment) {
             throw new IllegalStateException();
         }
     }
@@ -350,7 +259,7 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
                     Logger.i(TAG, "HTTP: body is " + response.toString());
 
                     MediaUser mediaUser = api.parseJsonResponse(response);
-                    state.successGetMediaUser(OfferListFragment.this, mediaUser);
+                    state.successGetMediaUser(PointHistoryListFragment.this, mediaUser);
                 }
             },
 
@@ -359,17 +268,17 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
                 public void onErrorResponse(VolleyError error) {
                     Logger.e(TAG, "HTTP: error = " + error.getMessage());
 
-                    state.failureGetMediaUser(OfferListFragment.this);
+                    state.failureGetMediaUser(PointHistoryListFragment.this);
                 }
             }
         );
 
-        ((MainActivity) getActivity()).showProgressDialog(null, getString(R.string.dialog_message_communicating));
+        mShowableProgressDialog.showProgressDialog(null, getString(R.string.dialog_message_communicating));
         mRequestQueue.add(request);
     }
 
     // キャンペーン情報 (案件情報) 取得
-    private void getCampaignData() {
+    private void getPointHistories() {
         MediaUser mediaUser = MediaUser.getMediaUser(getActivity());
 
         // TODO: 状態遷移でユーザー登録が確実にすんでいるようにする。
@@ -379,7 +288,7 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
         }
 
         // TODO: メディア ID 取得
-        final GetOffers api = GetOffers.create(1, mediaUserId);
+        final GetPointHistories api = GetPointHistories.create(1, mediaUserId);
 
         JsonArrayRequest request = new JsonArrayRequest(api.getUrl(),
 
@@ -388,8 +297,8 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
                 public void onResponse(JSONArray response) {
                     Logger.i(TAG, "HTTP: body is " + response.toString());
 
-                    offers = api.parseJsonResponse(response);
-                    state.successGetCampaginData(OfferListFragment.this, offers);
+                    mPointHistories = api.parseJsonResponse(response);
+                    state.successGetPointHistories(PointHistoryListFragment.this, mPointHistories);
                 }
             },
 
@@ -398,7 +307,7 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
                 public void onErrorResponse(VolleyError error) {
                     Logger.e(TAG, "HTTP: error = " + error.getMessage());
 
-                    state.failureGetCampaginData(OfferListFragment.this);
+                    state.failureGetPointHistories(PointHistoryListFragment.this);
                 }
             }
         );
@@ -406,21 +315,15 @@ public class OfferListFragment extends BaseFragment implements AbsListView.OnIte
         mRequestQueue.add(request);
     }
 
-    private void showCampaignData() {
+    // ポイント履歴を表示
+    private void showPointHistories() {
         // この時点で Activity が存在しないパターンがある
         if (getActivity() == null) {
-            Logger.e(TAG, "showCampaignData() getActivity is null.");
+            Logger.e(TAG, "showPointHistories() getActivity is null.");
             return;
         }
 
-        mAdapter = new OfferArrayAdapter(getActivity(), R.layout.row_offer, offers);
-        // http://skyarts.com/blog/jp/skyarts/?p=3964
-//        // API 9 で動かすための苦肉の策。
-//        if (mListView instanceof ListView) {
-//            ((ListView) mListView).setAdapter(adapter);
-//        } else {
-//            ((GridView) mListView).setAdapter(adapter);
-//        }
+        mAdapter = new PointHistoryArrayAdapter(getActivity(), R.layout.row_point_history, mPointHistories);
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
     }
 }

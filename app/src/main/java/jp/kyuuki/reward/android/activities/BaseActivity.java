@@ -7,28 +7,33 @@ import android.view.MenuItem;
 
 import jp.kyuuki.reward.android.R;
 import jp.kyuuki.reward.android.commons.Logger;
+import jp.kyuuki.reward.android.fragment.ProgressDialogFragment;
 
-public abstract class BaseActivity extends ActionBarActivity {
+public abstract class BaseActivity extends ActionBarActivity implements ShowableProgressDialog {
 
     protected String TAG = BaseActivity.class.getName();
+    protected String getLogTag() {
+        return TAG;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Logger.v(TAG, "onCreate()");
+        Logger.v(getLogTag(), "[" + this.hashCode() + "] onCreate()");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Logger.v(TAG, "onResume()");
+        Logger.v(getLogTag(), "[" + this.hashCode() + "] onResume()");
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_base, menu);
-        return true;
+        //getMenuInflater().inflate(R.menu.menu_base, menu);
+        //return true;
+        return false;
     }
 
     @Override
@@ -46,4 +51,24 @@ public abstract class BaseActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /*
+     * ShowableProgressDialog
+     */
+    ProgressDialogFragment progressDialog;
+
+    // 通信中ダイアログ
+    @Override
+    public void showProgressDialog(String title, String message) {
+        Logger.v(TAG, "showProgressDialog()");
+        progressDialog = ProgressDialogFragment.newInstance(title, message);
+        progressDialog.show(getSupportFragmentManager(), "progress");
+    }
+
+    @Override
+    public void dismissProgressDialog() {
+        Logger.v(TAG, "dismissProgressDialog()");
+        progressDialog.getDialog().dismiss();
+        // http://furudate.hatenablog.com/entry/2014/01/09/162421
+        // progressDialog.dismiss() がなぜダメか、仕組みがよくわかっていない。
+    }
 }

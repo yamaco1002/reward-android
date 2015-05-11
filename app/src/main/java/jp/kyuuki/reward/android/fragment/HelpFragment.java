@@ -22,9 +22,9 @@ import jp.kyuuki.reward.android.R;
  */
 public class HelpFragment extends BaseFragment {
 
-    {
-        TAG = HelpFragment.class.getName();
-    }
+    private static final String TAG = HelpFragment.class.getName();
+    @Override
+    protected String getLogTag() { return TAG; }
 
     private OnFragmentInteractionListener mListener;
 

@@ -30,9 +30,9 @@ import jp.kyuuki.reward.android.models.NavigationMenu;
  */
 public class NavigationDrawerFragment extends BaseFragment {
 
-    {
-        TAG = NavigationDrawerFragment.class.getName();
-    }
+    private static final String TAG = NavigationDrawerFragment.class.getName();
+    @Override
+    protected String getLogTag() { return TAG; }
 
     /**
      * Remember the position of the selected item.

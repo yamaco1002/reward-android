@@ -2,8 +2,6 @@ package jp.kyuuki.reward.android.models;
 
 /**
  * オファー。
- *
- * @author kyuuki
  */
 public class Offer {
     private String name;

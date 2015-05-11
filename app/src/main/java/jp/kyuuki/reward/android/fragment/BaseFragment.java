@@ -7,9 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import jp.kyuuki.reward.android.R;
 import jp.kyuuki.reward.android.commons.Logger;
 
 /**
@@ -17,7 +15,7 @@ import jp.kyuuki.reward.android.commons.Logger;
  */
 public abstract class BaseFragment extends Fragment {
 
-    protected String TAG = BaseFragment.class.getName();
+    private String TAG = BaseFragment.class.getName();
     protected String getLogTag() {
         return TAG;
     }
@@ -34,10 +32,9 @@ public abstract class BaseFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // super は呼ばない。
         Logger.v(getLogTag(), "[" +  this.hashCode() +"] onCreateView()");
         Logger.v(getLogTag(), "[" +  this.hashCode() +"]   savedInstanceState = " + savedInstanceState);
-        return null;
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override

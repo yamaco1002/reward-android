@@ -18,20 +18,19 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import jp.kyuuki.reward.android.commons.Logger;
 import jp.kyuuki.reward.android.commons.VolleyUtils;
 import jp.kyuuki.reward.android.components.GcmManager;
 import jp.kyuuki.reward.android.components.api.PostMediaUsers;
-import jp.kyuuki.reward.android.components.api.RewardApi;
 import jp.kyuuki.reward.android.components.Terminal;
 import jp.kyuuki.reward.android.fragment.AboutFragment;
 import jp.kyuuki.reward.android.fragment.HelpFragment;
 import jp.kyuuki.reward.android.fragment.NavigationDrawerFragment;
 import jp.kyuuki.reward.android.R;
 import jp.kyuuki.reward.android.fragment.OfferListFragment;
+import jp.kyuuki.reward.android.fragment.PointHistoryListFragment;
 import jp.kyuuki.reward.android.fragment.ProgressDialogFragment;
 import jp.kyuuki.reward.android.models.MediaUser;
 import jp.kyuuki.reward.android.models.NavigationMenu;
@@ -41,9 +40,9 @@ public class MainActivity extends BaseActivity
                    GcmManager.GcmManagerCallbacks,
                    OfferListFragment.OnFragmentInteractionListener {
 
-    {
-        TAG = MainActivity.class.getName();
-    }
+    private static final String TAG = MainActivity.class.getName();
+    @Override
+    protected String getLogTag() { return TAG; }
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -69,6 +68,8 @@ public class MainActivity extends BaseActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
 
+        // TODO: 回転とかで毎回通信が走るのをまじめに対処。
+
         // TODO: GDM 状態遷移
         // TODO: 初期化処理中は通信中的な表示にする
         GcmManager gcmManager = GcmManager.getInstance(getApplicationContext(), this);
@@ -93,20 +94,34 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
+        Logger.v(TAG, "[" + this.hashCode() + "] onNavigationDrawerItemSelected() position = " + position);
+
         // update the main content by replacing fragments
         Fragment fragment;
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragment = fragmentManager.findFragmentByTag("main");
+        Logger.e(TAG, "fragment = " + fragment);
 
         NavigationMenu[] values = NavigationMenu.values();
         NavigationMenu navigationMenu = values[position];
         switch (navigationMenu) {
             case OFFER_LIST:
+                // オファー一覧は作り直さない
+                if (fragment instanceof OfferListFragment) {
+                    return;
+                }
                 fragment = OfferListFragment.newInstance();
                 break;
             case POINT_EXCHANGE:
                 fragment = PlaceholderFragment.newInstance(0);
                 break;
             case POINT_HISTORY:
-                fragment = PlaceholderFragment.newInstance(0);
+                // ポイント履歴一覧は作り直さない
+                if (fragment instanceof PointHistoryListFragment) {
+                    return;
+                }
+                fragment = PointHistoryListFragment.newInstance();
                 break;
             case HELP:
                 fragment = HelpFragment.newInstance();
@@ -118,9 +133,9 @@ public class MainActivity extends BaseActivity
                 throw new IllegalStateException();
         }
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
+        //FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
+                .replace(R.id.container, fragment, "main")
                 .commit();
     }
 
@@ -152,11 +167,13 @@ public class MainActivity extends BaseActivity
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.main, menu);
+            //getMenuInflater().inflate(R.menu.main, menu);
             restoreActionBar();
-            return true;
+            //return true;
+            return false;
         }
-        return super.onCreateOptionsMenu(menu);
+        return false;
+        //return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -218,21 +235,6 @@ public class MainActivity extends BaseActivity
                 .commit();
     }
 
-    ProgressDialogFragment progressDialog;
-
-    // 通信中ダイアログ
-    public void showProgressDialog(String title, String message) {
-        Logger.v(TAG, "showProgressDialog()");
-        progressDialog = ProgressDialogFragment.newInstance(title, message);
-        progressDialog.show(getSupportFragmentManager(), "progress");
-    }
-
-    public void dismissProgressDialog() {
-        Logger.v(TAG, "dismissProgressDialog()");
-        progressDialog.getDialog().dismiss();
-        // http://furudate.hatenablog.com/entry/2014/01/09/162421
-        // progressDialog.dismiss() がなぜダメか、仕組みがよくわかっていない。
-    }
 
     /**
      * A placeholder fragment containing a simple view.

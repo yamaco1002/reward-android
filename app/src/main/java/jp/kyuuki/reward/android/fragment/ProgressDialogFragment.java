@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 
 /**
- * ’ÊM’†ƒ_ƒCƒAƒƒOB
+ * é€šä¿¡ä¸­ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã€‚
  *
  * - http://furudate.hatenablog.com/entry/2014/01/09/162421
  */
